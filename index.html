@@ -98,14 +98,6 @@
     <h1>Test de paiement TalyPay</h1>
     <p class="sub">Formulaire minimal pour valider ton intégration en live.</p>
 
-    <div class="config-note">
-      ⚠️ Avant de tester : remplace <code>tk_test_LlfwFkIiOidiUJl3DPR7pbtSKUY7QqNbKW9QSfbkxPa47vPUfj09ZhVUk7gTM5Q9</code> dans le code source
-      (ligne <code>const talypay = new TalyPay(...)</code>) par ta vraie clé
-      <code>tk_live_...</code> récupérée dans ton tableau de bord TalyPay. Ne partage
-      jamais cette page publiquement avec ta clé en dur dedans si c'est la clé secrète —
-      pour un test rapide côté client, utilise la clé publique de ton compte.
-    </div>
-
     <form id="payment-form">
       <label for="name">Nom</label>
       <input type="text" id="name" required placeholder="Ex: Houndagnon">
