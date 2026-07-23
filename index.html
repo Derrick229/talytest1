@@ -1,197 +1,339 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test paiement — TalyPay (production)</title>
-<script src="https://talypay-me.com/cdn-talypay/talypay.min.js"></script>
-<style>
-  :root {
-    --ink: #1a1a1a;
-    --paper: #faf9f7;
-    --line: #e2e0db;
-    --accent: #0044cc;
-    --ok: #1e7d3a;
-    --warn: #b3401f;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    display: flex;
-    justify-content: center;
-    padding: 48px 20px;
-  }
-  .card {
-    width: 100%;
-    max-width: 440px;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 32px;
-  }
-  h1 { font-size: 1.3rem; margin: 0 0 4px; }
-  .sub { color: #666; font-size: 0.9rem; margin: 0 0 24px; }
-  .badge {
-    display: inline-block;
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: #fde8e0;
-    color: var(--warn);
-    margin-bottom: 18px;
-  }
-  label {
-    display: block;
-    font-size: 0.82rem;
-    font-weight: 600;
-    margin: 14px 0 5px;
-  }
-  input, select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 7px;
-    font-size: 0.95rem;
-  }
-  .hint {
-    font-size: 0.78rem;
-    color: #888;
-    margin-top: 4px;
-  }
-  .config-note {
-    background: #fff8e6;
-    border: 1px solid #f0d98c;
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 0.83rem;
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
-  .config-note code {
-    background: #fff;
-    padding: 1px 5px;
-    border-radius: 4px;
-    border: 1px solid #eadb9f;
-  }
-  #widget-slot { margin-top: 22px; }
-  #status {
-    margin-top: 18px;
-    padding: 12px 14px;
-    border-radius: 8px;
-    font-size: 0.88rem;
-    display: none;
-  }
-  #status.ok { display: block; background: #e9f6ec; color: var(--ok); border: 1px solid #b7e2c1; }
-  #status.err { display: block; background: #fdecec; color: var(--warn); border: 1px solid #f3bdae; }
-  #status.pending { display: block; background: #f0f4fb; color: #2452a8; border: 1px solid #c6d5f0; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalyPay Sandbox - Test de paiement</title>
+
+    <!-- SDK officiel -->
+    <script src="https://talypay-me.com/js-sdk/talypay-sdk.js"></script>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#f5f5f5;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            min-height:100vh;
+            padding:20px;
+        }
+
+        .card{
+            width:100%;
+            max-width:470px;
+            background:white;
+            border-radius:12px;
+            box-shadow:0 10px 25px rgba(0,0,0,.08);
+            padding:30px;
+        }
+
+        h2{
+            margin-bottom:8px;
+        }
+
+        .subtitle{
+            color:#666;
+            margin-bottom:25px;
+        }
+
+        .badge{
+            display:inline-block;
+            background:#FFF3CD;
+            color:#856404;
+            padding:7px 14px;
+            border-radius:30px;
+            margin-bottom:18px;
+            font-size:13px;
+            font-weight:bold;
+        }
+
+        label{
+            display:block;
+            margin-top:16px;
+            margin-bottom:6px;
+            font-weight:bold;
+        }
+
+        input,
+        select{
+            width:100%;
+            padding:12px;
+            border:1px solid #ddd;
+            border-radius:8px;
+            font-size:15px;
+        }
+
+        button{
+            width:100%;
+            margin-top:28px;
+            padding:14px;
+            background:#0057d9;
+            color:white;
+            border:none;
+            border-radius:8px;
+            cursor:pointer;
+            font-size:16px;
+            font-weight:bold;
+        }
+
+        button:disabled{
+            opacity:.6;
+            cursor:not-allowed;
+        }
+
+        #status{
+            display:none;
+            margin-top:20px;
+            padding:15px;
+            border-radius:8px;
+        }
+
+        .pending{
+            display:block;
+            background:#e8f1ff;
+            color:#0057d9;
+        }
+
+        .success{
+            display:block;
+            background:#d1fae5;
+            color:#065f46;
+        }
+
+        .error{
+            display:block;
+            background:#fde2e1;
+            color:#b42318;
+        }
+
+        .hint{
+            font-size:12px;
+            color:#777;
+            margin-top:5px;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="card">
-    <span class="badge">Mode production — argent réel</span>
-    <h1>Test de paiement TalyPay</h1>
-    <p class="sub">Formulaire minimal pour valider ton intégration en live.</p>
+
+<div class="card">
+
+    <div class="badge">🧪 Mode Sandbox</div>
+
+    <h2>Test TalyPay</h2>
+
+    <div class="subtitle">
+        Paiement Mobile Money en environnement de test.
+    </div>
 
     <form id="payment-form">
-      <label for="name">Nom</label>
-      <input type="text" id="name" required placeholder="Ex: Houndagnon">
 
-      <label for="firstname">Prénom</label>
-      <input type="text" id="firstname" placeholder="Ex: Derrick">
+        <label>Nom</label>
+        <input
+            id="name"
+            value="AKOSSOU"
+            required>
 
-      <label for="email">Email</label>
-      <input type="email" id="email" required placeholder="toi@exemple.com">
+        <label>Prénom</label>
+        <input
+            id="firstname"
+            value="Francinne">
 
-      <label for="phone">Téléphone (format international, sans +)</label>
-      <input type="tel" id="phone" required placeholder="2290190000000">
-      <div class="hint">Ex : 229 + numéro MTN Bénin</div>
+        <label>Email</label>
+        <input
+            id="email"
+            type="email"
+            value="francinne@test.com"
+            required>
 
-      <label for="amount">Montant (FCFA, min 100)</label>
-      <input type="number" id="amount" min="100" value="100" required>
+        <label>Téléphone</label>
 
-      <label for="mode">Moyen de paiement</label>
-      <select id="mode">
-        <option value="mtn_momo">MTN Mobile Money</option>
-        <option value="moov_money">Moov Money</option>
-        <option value="celtiis_money">Celtiis Money</option>
-        <option value="card">Carte bancaire</option>
-      </select>
+        <input
+            id="phone"
+            value="229019000000"
+            required>
 
-      <div id="widget-slot">
-        <button type="submit" id="submitBtn" style="width:100%;margin-top:22px;padding:12px;border:none;border-radius:7px;background:var(--accent);color:#fff;font-weight:600;font-size:0.95rem;cursor:pointer;">
-          Payer maintenant
+        <div class="hint">
+            Numéro Sandbox fourni par TalyPay
+        </div>
+
+        <label>Montant (FCFA)</label>
+
+        <input
+            id="amount"
+            type="number"
+            value="1000"
+            min="100"
+            required>
+
+        <label>Moyen de paiement</label>
+
+        <select id="mode">
+            <option value="mtn_momo">MTN Mobile Money</option>
+            <option value="moov_money">Moov Money</option>
+            <option value="celtiis_money">Celtiis Money</option>
+            <option value="card">Carte bancaire</option>
+        </select>
+
+        <button id="submitBtn">
+            Payer maintenant
         </button>
-      </div>
+
     </form>
 
     <div id="status"></div>
-  </div>
+
+</div>
 
 <script>
-  // ⚠️ Remplace la clé ci-dessous par ta clé publique de PRODUCTION (tk_live_...)
-  const talypay = new TalyPay('tk_test_LlfwFkIiOidiUJl3DPR7pbtSKUY7QqNbKW9QSfbkxPa47vPUfj09ZhVUk7gTM5Q9', {
-    sandbox: true, // false = mode production réel
-    maxStatusCheckAttempts: 60,
 
-    onSuccess: (response) => {
-      const el = document.getElementById('status');
-      el.className = 'ok';
-      el.textContent = '✅ Paiement confirmé ! Référence : ' + response.payment_ref;
-      document.getElementById('submitBtn').disabled = false;
-      document.getElementById('submitBtn').textContent = 'Payer maintenant';
-    },
+if(typeof TalyPay==="undefined"){
 
-    onError: (error) => {
-      const el = document.getElementById('status');
-      el.className = 'err';
-      el.textContent = '❌ Erreur : ' + error.message;
-      document.getElementById('submitBtn').disabled = false;
-      document.getElementById('submitBtn').textContent = 'Payer maintenant';
-    },
+    alert("Le SDK TalyPay ne s'est pas chargé.");
 
-    onPending: (data) => {
-      const el = document.getElementById('status');
-      el.className = 'pending';
-      el.textContent = '⏳ Vérification en cours (' + data.attempt + '/' + data.max_attempts + ')...';
-    }
-  });
+    throw new Error("SDK introuvable");
 
-  document.getElementById('payment-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('submitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Traitement...';
+}
 
-    const status = document.getElementById('status');
-    status.className = 'pending';
-    status.textContent = '⏳ Paiement en cours d\'initialisation...';
+const btn=document.getElementById("submitBtn");
 
-    try {
-      await talypay.initPayment({
-        payment_mode: document.getElementById('mode').value,
-        customer_name: document.getElementById('name').value,
-        customer_firstname: document.getElementById('firstname').value,
-        customer_email: document.getElementById('email').value,
-        customer_tel: document.getElementById('phone').value,
-        amount: parseInt(document.getElementById('amount').value, 10),
-        currency: 'XOF',
-        country: 'benin',
-        payment_ref: 'TEST-' + Date.now(),
-        description: 'Test d\'intégration TalyPay en production'
-      }, true);
-    } catch (error) {
-      status.className = 'err';
-      status.textContent = '❌ ' + error.message;
-      btn.disabled = false;
-      btn.textContent = 'Payer maintenant';
-    }
-  });
+const status=document.getElementById("status");
+
+function showStatus(type,message){
+
+    status.className=type;
+
+    status.innerHTML=message;
+
+}
+
+const talypay=new TalyPay(
+
+"tk_test_QjTiAe7QK70vVxDWLC4TBKGz3cQdJJPQogNP0p3m9eCQPRGGpC8hWnolDa0cWhvj",
+
+{
+
+sandbox:true,
+
+maxStatusCheckAttempts:60,
+
+onPending:(data)=>{
+
+    console.log(data);
+
+    showStatus(
+        "pending",
+        `⏳ Vérification ${data.attempt}/${data.max_attempts}...`
+    );
+
+},
+
+onSuccess:(response)=>{
+
+    console.log(response);
+
+    showStatus(
+        "success",
+        `✅ Paiement confirmé.<br><br>
+        Référence : <b>${response.payment_ref}</b>`
+    );
+
+    btn.disabled=false;
+
+    btn.innerHTML="Payer maintenant";
+
+},
+
+onError:(error)=>{
+
+    console.error(error);
+
+    showStatus(
+        "error",
+        "❌ "+(error.message||"Erreur inconnue")
+    );
+
+    btn.disabled=false;
+
+    btn.innerHTML="Payer maintenant";
+
+}
+
+}
+
+);
+
+document.getElementById("payment-form")
+
+.addEventListener("submit",async(e)=>{
+
+e.preventDefault();
+
+btn.disabled=true;
+
+btn.innerHTML="Traitement...";
+
+showStatus(
+"pending",
+"⏳ Initialisation du paiement..."
+);
+
+try{
+
+await talypay.initPayment({
+
+payment_mode:document.getElementById("mode").value,
+
+customer_name:document.getElementById("name").value,
+
+customer_firstname:document.getElementById("firstname").value,
+
+customer_email:document.getElementById("email").value,
+
+customer_tel:document.getElementById("phone").value,
+
+amount:Number(document.getElementById("amount").value),
+
+currency:"XOF",
+
+country:"benin",
+
+payment_ref:"ORDER-"+Date.now(),
+
+description:"Paiement Sandbox",
+
+callback_url:"",
+
+metadata:{}
+
+},true);
+
+}
+catch(error){
+
+console.error(error);
+
+showStatus(
+"error",
+"❌ "+(error.message||JSON.stringify(error))
+);
+
+btn.disabled=false;
+
+btn.innerHTML="Payer maintenant";
+
+}
+
+});
+
 </script>
+
 </body>
 </html>
